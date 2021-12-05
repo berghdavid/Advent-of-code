@@ -68,11 +68,11 @@ def solve():
 
       x = pipe[0][0]
       y = pipe[0][1]
-      for i in range(abs(yDiff) + 1):
-        x = pipe[0][0] + i*xAdder
-        y = pipe[0][1] + i*yAdder
-
+      for i in range(abs(xDiff) + 1):
         matrix[y][x] = matrix[y][x] + 1
+        
+        x += xAdder
+        y += yAdder
 
   collisions = 0
   for row in matrix:
