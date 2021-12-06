@@ -14,7 +14,7 @@ def parse_input():
 def solve():
   global fish
 
-  for i in range(80):
+  for i in range(256):
     newFish = [0 for x in range(9)]
 
     for f in range(9):
