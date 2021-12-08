@@ -39,4 +39,5 @@ def main():
   parse_input()
   print(solve())
 
-main()
+if __name__ == "__main__":
+  main()

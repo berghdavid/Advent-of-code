@@ -40,4 +40,5 @@ def main():
   sol = solve()
   print(sol)
 
-main()
+if __name__ == "__main__":
+  main()

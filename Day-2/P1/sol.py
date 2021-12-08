@@ -29,4 +29,5 @@ def main():
   nbr = solve()
   print(nbr)
 
-main()
+if __name__ == "__main__":
+  main()

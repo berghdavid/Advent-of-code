@@ -1,13 +1,17 @@
 import fileinput
 
-def parse_input():
-  measurements = list()
-  for line in fileinput.input():
-    measurements.append(int(line.strip()))
-  fileinput.close()
-  return measurements
+measurements = list()
 
-def solve(measurements):
+def parse_input():
+  global measurements
+  
+  for line in fileinput.input():
+    measurements.append(int(line))
+  fileinput.close()
+
+def solve():
+  global measurements
+
   nbr = 0
   for i in range(len(measurements) - 1):
     if(measurements[i] < measurements[i + 1]):
@@ -15,8 +19,8 @@ def solve(measurements):
   return nbr
 
 def main():
-  measurements = parse_input()
-  nbr = solve(measurements)
-  print(nbr)
+  parse_input()
+  print(solve())
 
-main()
+if __name__ == "__main__":
+  main()

@@ -19,4 +19,5 @@ def main():
   nbr = solve(measurements)
   print(nbr)
 
-main()
+if __name__ == "__main__":
+  main()
