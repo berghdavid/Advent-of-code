@@ -70,10 +70,10 @@ def solve():
         else:
           segments[i]["eg"] = val + symbol
           break
+    
 
   for i in range(size):
-    row = right[i]
-    for nbr in row:
+    for nbr in right[i]:
       length = len(nbr)
 
       if(length == 2):
