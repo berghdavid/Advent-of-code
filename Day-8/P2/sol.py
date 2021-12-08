@@ -2,21 +2,6 @@ import fileinput
 
 left = list()
 right = list()
-segments = {
-  1: [          "c",           "f"     ], #LEN: 2
-  7: ["a",      "c",           "f"     ], #LEN: 3
-  4: [     "b", "c", "d",      "f"     ], #LEN: 4
-  8: ["a", "b", "c", "d", "e", "f", "g"], #LEN: 7
-
-  2: ["a",      "c", "d", "e",      "g"], #LEN: 5
-  3: ["a",      "c", "d",      "f", "g"], #LEN: 5
-  5: ["a", "b",      "d",      "f", "g"], #LEN: 5
-
-  0: ["a", "b", "c",      "e", "f", "g"], #LEN: 6
-  6: ["a", "b",      "d", "e", "f", "g"], #LEN: 6
-  9: ["a", "b", "c", "d",      "f", "g"], #LEN: 6
-}
-
 
 def parse_input():
   global left, right
@@ -39,70 +24,66 @@ def parse_input():
 def solve():
   global left, right
   size = len(left)
-  solutions = ["" for x in range(size)]
-  segments = [dict.fromkeys(["a", "cf", "eg"]) for x in range(size)]
+  sum = 0
 
   for i in range(size):
+    segments = dict.fromkeys(["a", "cf", "eg"])
+    solution = ""
+    
     for word in left[i]:
-      l = len(word)
+      length = len(word)
 
-      if(l == 2):
+      if(length == 2):
         n_1 = word
-        segments[i]["cf"] = word
-      elif(l == 3):
+        segments["cf"] = word
+      elif(length == 3):
         n_7 = word
-      elif(l == 4):
+      elif(length == 4):
         n_4 = word
-      elif(l == 7):
+      elif(length == 7):
         n_8 = word
     
     for symbol in n_7:
       if(symbol not in n_1):
-        segments[i]["a"] = symbol
+        segments["a"] = symbol
         break
       
     group = n_4 + n_7
     for symbol in n_8:
       if(symbol not in group):
-        val = segments[i]["eg"]
+        val = segments["eg"]
         if(val == None):
-          segments[i]["eg"] = symbol
+          segments["eg"] = symbol
         else:
-          segments[i]["eg"] = val + symbol
+          segments["eg"] = val + symbol
           break
     
-
-  for i in range(size):
     for nbr in right[i]:
-      length = len(nbr)
 
       if(length == 2):
-        solutions[i] += "1"
+        solution += "1"
       elif(length == 3):
-        solutions[i] += "7"
+        solution += "7"
       elif(length == 4):
-        solutions[i] += "4"
+        solution += "4"
       elif(length == 7):
-        solutions[i] = "8"
+        solution += "8"
       elif(length == 5):
-        if(string_in_string(segments[i]["eg"], nbr)):
-          solutions[i] += "2"
-        elif(string_in_string(segments[i]["cf"], nbr)):
-          solutions[i] += "3"
+        if(string_in_string(segments["eg"], nbr)):
+          solution += "2"
+        elif(string_in_string(segments["cf"], nbr)):
+          solution += "3"
         else:
-          solutions[i] += "5"
+          solution += "5"
       else:
-        if(not string_in_string(segments[i]["eg"], nbr)):
-          solutions[i] += "9"
-        elif(string_in_string(segments[i]["cf"], nbr)):
-          solutions[i] += "0"
+        if(not string_in_string(segments["eg"], nbr)):
+          solution += "9"
+        elif(string_in_string(segments["cf"], nbr)):
+          solution += "0"
         else:
-          solutions[i] += "6"
-
-  sum = 0
-  for nbr in solutions:
-    sum += int(nbr)
-
+          solution += "6"
+    sum += int(solution)
+  
   return sum
 
 def string_in_string(s1, s2):
