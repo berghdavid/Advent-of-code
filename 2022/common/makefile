@@ -11,14 +11,14 @@ gcc: task1.c task2.c utils.c utils.h
 
 .PHONY: run_simple
 run_simple: gcc
-	@./task1 < data1.in
-	@./task2 < data2.in
+	@./task1 < data.in
+	@./task2 < data.in
 
 .PHONY: run_time
 FORMAT = '\t- Execution time: %E'
 run_time: gcc
-	@time -f $(FORMAT) ./task1 < data1.in
-	@time -f $(FORMAT) ./task2 < data2.in
+	@time -f $(FORMAT) ./task1 < data.in
+	@time -f $(FORMAT) ./task2 < data.in
 
 .PHONY: gcc-debug
 gcc-debug: task1.c task2.c utils.c utils.h
@@ -27,8 +27,8 @@ gcc-debug: task1.c task2.c utils.c utils.h
 
 .PHONY: run_valg
 run_valg: gcc-debug
-	@valgrind --leak-check=full --track-origins=yes ./task1 < data1.in
-	@valgrind --leak-check=full --track-origins=yes ./task2 < data2.in
+	@valgrind --leak-check=full --track-origins=yes ./task1 < data.in
+	@valgrind --leak-check=full --track-origins=yes ./task2 < data.in
 
 .PHONY: clean
 clean: gcc
