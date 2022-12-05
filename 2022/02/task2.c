@@ -93,7 +93,7 @@ int sum_points(Game* g)
 	return sum;
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	int     ans;
 	Game*	g;

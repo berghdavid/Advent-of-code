@@ -232,7 +232,7 @@ Hangar* solve()
 	return h;
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	Hangar*	h;
 	h = solve();

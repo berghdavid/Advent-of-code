@@ -81,7 +81,7 @@ void check_max(Node_t* n, int d)
         }
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
         Node_t* n;
         int     max;

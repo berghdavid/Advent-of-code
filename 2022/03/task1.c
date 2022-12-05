@@ -101,7 +101,7 @@ int pts(char c)
 	return ans;
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	int	ans;
 	int	i;
