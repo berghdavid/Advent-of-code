@@ -126,17 +126,17 @@ Hangar*	init_hangar()
 			crate->next = NULL;
 			crate->id = c;
 			append(h, crate, count % h->size);
-			getchar();	/* getchar() == ']'	*/
+			getchar();		/* Skip ']'	*/
 		} else if (c == ' '){
 			c = getchar();
 			if (c == ' ') {
-				getchar(); /* getchar() == ' '	*/
+				getchar();	/* Skip ' '	*/
 			} else {
 				break;
 			}
 		}
 
-		getchar();		/* getchar()==' '||'\n'	*/
+		getchar();			/* Skip blanks	*/
 		count++;
 	}
 
@@ -150,12 +150,16 @@ Hangar*	init_hangar()
 void free_hangar(Hangar* h)
 {
 	int	i;
+	Crate*	c;
 	Stack*	s;
 
 	for (i = 0; i < h->size; i++) {
 		s = &h->row[i];
-		while (s->first != NULL) {
-			free(pop(h, i, 1));
+		c = s->first;
+		while (c != NULL) {
+			s->first = c->next;
+			free(c);
+			c = s->first;
 		}
 	}
 	free(h->row);
