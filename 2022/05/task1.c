@@ -190,7 +190,6 @@ void make_moves(Hangar* h)
 	int	nbr;
 	int	from;
 	int	i;
-	Crate*	crate;
 
 	counter = 0;
 	while ((i = next_int()) != -1) {

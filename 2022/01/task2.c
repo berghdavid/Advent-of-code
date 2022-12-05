@@ -32,7 +32,7 @@ Node_t* build_nodes(int size)
         return first;
 }
 
-Node_t* free_nodes(Node_t* n)
+void free_nodes(Node_t* n)
 {
         Node_t* temp;
         Node_t* next;

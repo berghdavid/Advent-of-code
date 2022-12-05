@@ -117,7 +117,6 @@ int is_in(char c, Sack* s)
 
 char get_badge(Group* g)
 {
-	int	i;
 	Letter*	l;
 
 	l = g->elf_1->comp1;
@@ -146,11 +145,9 @@ int pts(char c)
 int main(int argc, char *argv[])
 {
 	int	ans;
-	int	i;
 	Group*	g;
 
 	ans = 0;
-	i = 0;
 
 	while ((g = build_group()) != NULL) {
 		ans += pts(get_badge(g));

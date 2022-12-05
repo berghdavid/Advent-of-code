@@ -62,7 +62,6 @@ Stack* pop(Hangar* h, int row, int nbr)
 {
 	int	i;
 	Crate*	c;
-	Crate*	first;
 	Stack*	s;
 	Stack*	new;
 
@@ -173,7 +172,6 @@ void make_moves(Hangar* h)
 	int	nbr;
 	int	from;
 	int	i;
-	Crate*	crate;
 
 	counter = 0;
 	while ((i = next_int()) != -1) {
