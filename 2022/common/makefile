@@ -5,9 +5,9 @@ time: run_time clean
 valgrind: run_valg clean
 
 .PHONY: gcc
-gcc: task1.c task2.c utils.c utils.h
-	@gcc task1.c utils.c -o task1
-	@gcc task2.c utils.c -o task2
+gcc: task1.c task2.c ../common/utils.c ../common/utils.h
+	@gcc task1.c ../common/utils.c -o task1
+	@gcc task2.c ../common/utils.c -o task2
 
 .PHONY: run_simple
 run_simple: gcc
@@ -21,9 +21,9 @@ run_time: gcc
 	@time -f $(FORMAT) ./task2 < data.in
 
 .PHONY: gcc-debug
-gcc-debug: task1.c task2.c utils.c utils.h
-	@gcc task1.c utils.c -ggdb3 -o task1
-	@gcc task2.c utils.c -ggdb3 -o task2
+gcc-debug: task1.c task2.c ../common/utils.c ../common/utils.h
+	@gcc task1.c ../common/utils.c -ggdb3 -o task1
+	@gcc task2.c ../common/utils.c -ggdb3 -o task2
 
 .PHONY: run_valg
 run_valg: gcc-debug

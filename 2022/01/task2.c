@@ -1,7 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils.h"
+#include "../common/utils.h"
 
 typedef struct Node_t Node_t;
 
