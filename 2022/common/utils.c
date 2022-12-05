@@ -2,6 +2,12 @@
 #include <ctype.h>
 #include "utils.h"
 
+/**
+ * @brief Read the next positive integer.
+ * 
+ * @return Returns -1 on EOF and 0 if input is not a digit. Otherwise returns
+ * any positive integer.
+ */
 int next_int()
 {
         int     x;
