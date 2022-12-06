@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <string.h>
 
 const int MARKER_LENGTH = 14;
 const char EMPTY = '-';
@@ -126,7 +128,7 @@ int find_match(List* l, char c)
 	return i;
 }
 
-int count_marker_length()
+void solve(char* ans)
 {
 	int	curr_size;
 	int	length;
@@ -152,18 +154,36 @@ int count_marker_length()
 		}
 	}
 
+	sprintf(ans, "%d", length);
 	free_nodes(l);
-
-	return length;
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
-	int	ans;
+	char		ans[100];
+	struct timeval	begin, end;
+	long		seconds;
+	long		microseconds;
+	double		elapsed_ms;
 
-	ans = count_marker_length();
+	if (argc == 0) {
+		return 0;
+	}
 
-	printf("Task 2 ans: %d\n", ans);
+	if (argc > 1 && strcmp(argv[1], "time") == 0) {
+		gettimeofday(&begin, 0);
+		solve(ans);
+		gettimeofday(&end, 0);
+
+		seconds = end.tv_sec - begin.tv_sec;
+		microseconds = end.tv_usec - begin.tv_usec;
+		elapsed_ms = seconds*1e3 + microseconds*1e-3;
+		printf("%s execution time: %.3f (ms)\n", argv[0], elapsed_ms);
+	} else {
+		solve(ans);
+	}
+
+	printf("%s ans: %s\n", argv[0], ans);
 
 	return 0;
 }

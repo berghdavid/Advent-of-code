@@ -17,8 +17,8 @@ run_simple: gcc
 .PHONY: run_time
 FORMAT = '\t- Execution time: %E'
 run_time: gcc
-	@time -f $(FORMAT) ./task1 < data.in
-	@time -f $(FORMAT) ./task2 < data.in
+	@./task1 time < data.in
+	@./task2 time < data.in
 
 .PHONY: gcc-debug
 gcc-debug: task1.c task2.c ../common/utils.c ../common/utils.h

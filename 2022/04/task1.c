@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <string.h>
 #include "../common/utils.h"
 
 typedef struct Team Team;
@@ -40,29 +42,48 @@ int contains_range(Team* t)
 		(t->min_2 <= t->min_1 && t->max_2 >= t->max_1);
 }
 
-int solve()
+void solve(char* ans)
 {
-	int	ans;
+	int	in_range;
 	Team*	t;
 
-	ans = 0;
+	in_range = 0;
 	while ((t = build_team()) != NULL) {
 		if (contains_range(t)) {
-			ans++;
+			in_range++;
 		}
 		free_team(t);
 	}
-
-	return ans;
+	
+	sprintf(ans, "%d", in_range);
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
-	int	ans;
+	char		ans[100];
+	struct timeval	begin, end;
+	long		seconds;
+	long		microseconds;
+	double		elapsed_ms;
 
-	ans = solve();
+	if (argc == 0) {
+		return 0;
+	}
 
-	printf("Task 1 ans: %d\n", ans);
+	if (argc > 1 && strcmp(argv[1], "time") == 0) {
+		gettimeofday(&begin, 0);
+		solve(ans);
+		gettimeofday(&end, 0);
+
+		seconds = end.tv_sec - begin.tv_sec;
+		microseconds = end.tv_usec - begin.tv_usec;
+		elapsed_ms = seconds*1e3 + microseconds*1e-3;
+		printf("%s execution time: %.3f (ms)\n", argv[0], elapsed_ms);
+	} else {
+		solve(ans);
+	}
+
+	printf("%s ans: %s\n", argv[0], ans);
 
 	return 0;
 }

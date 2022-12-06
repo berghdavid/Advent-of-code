@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <sys/time.h>
+#include <string.h>
 #include "../common/utils.h"
 
 const int STACKS = 9;
@@ -140,25 +142,6 @@ Hangar*	init_hangar()
 	return h;
 }
 
-void print_hangar(Hangar* h)
-{
-	int	i;
-	Crate*	c;
-	Stack*	s;
-
-	printf(" --- Hangar ---\n");
-	for (i = 0; i < h->size; i++) {
-		s = &h->row[i];
-		printf("Stack %d:", i + 1);
-		c = s->first;
-		while (c != NULL) {
-			printf(" %c", c->id);
-			c = c->next;
-		}
-		printf("\n");
-	}
-}
-
 void free_hangar(Hangar* h)
 {
 	int	i;
@@ -220,7 +203,7 @@ void calc_ans(Hangar* h)
 	}
 }
 
-Hangar* solve()
+void solve(char* ans)
 {
 	Hangar*	h;
 
@@ -229,17 +212,36 @@ Hangar* solve()
 	make_moves(h);
 	calc_ans(h);
 
-	return h;
+	sprintf(ans, "%s", h->ans);
+	free_hangar(h);
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
-	Hangar*	h;
-	h = solve();
+	char		ans[100];
+	struct timeval	begin, end;
+	long		seconds;
+	long		microseconds;
+	double		elapsed_ms;
 
-	printf("Task 1 ans: %s\n", h->ans);
+	if (argc == 0) {
+		return 0;
+	}
 
-	free_hangar(h);
+	if (argc > 1 && strcmp(argv[1], "time") == 0) {
+		gettimeofday(&begin, 0);
+		solve(ans);
+		gettimeofday(&end, 0);
+
+		seconds = end.tv_sec - begin.tv_sec;
+		microseconds = end.tv_usec - begin.tv_usec;
+		elapsed_ms = seconds*1e3 + microseconds*1e-3;
+		printf("%s execution time: %.3f (ms)\n", argv[0], elapsed_ms);
+	} else {
+		solve(ans);
+	}
+
+	printf("%s ans: %s\n", argv[0], ans);
 
 	return 0;
 }
