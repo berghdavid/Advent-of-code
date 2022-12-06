@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+
 const int MARKER_LENGTH = 14;
 const char EMPTY = '-';
 
@@ -60,20 +62,21 @@ void free_nodes(List* l)
 }
 
 /**
- * @brief Resets the last n nodes.
+ * @brief Resets the nodes between nodes res and max counted backwards from the 
+ * last node in the list.
  */
-void reset_nodes(List* l, int res)
+void reset_nodes(List* l, int res, int max)
 {
 	int	i;
 	Node*	n;
 
 	n = l->last->prev;
 
-	i = 1;
-	while (n != NULL) {
-		if (i++ >= res) {
-			n->c = EMPTY;
-		}
+	for (i = 1; i < res; i++) {
+		n = n->prev;
+	}
+	for (i = res; i <= max; i++) {
+		n->c = EMPTY;
 		n = n->prev;
 	}
 }
@@ -127,6 +130,7 @@ int find_match(List* l, char c)
 
 int count_marker_length()
 {
+	int	curr_size;
 	int	length;
 	int	resets;
 	char	c;
@@ -134,15 +138,17 @@ int count_marker_length()
 
 	l = build_nodes(MARKER_LENGTH);
 	length = 0;
+	curr_size = 0;
 	
 	while ((c = getchar()) != EOF) {
 		insert_char(l, c);
 		resets = find_match(l, c);
 		length++;
 		if (resets == 0) {
-			continue;
+			curr_size++;
 		} else if (resets != MARKER_LENGTH) {
-			reset_nodes(l, resets);
+			reset_nodes(l, resets, curr_size);
+			curr_size = resets;
 		} else {
 			break;
 		}
