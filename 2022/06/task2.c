@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-
 const int MARKER_LENGTH = 14;
 const char EMPTY = '-';
 
