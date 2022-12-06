@@ -1,13 +1,163 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include "../common/utils.h"
+
+const int MARKER_LENGTH = 14;
+const char EMPTY = '-';
+
+typedef struct Node Node;
+typedef struct List List;
+
+struct Node {
+	char	c;
+	Node*	prev;
+	Node*	next;
+};
+
+struct List {
+	Node*	first;
+	Node*	last;
+};
+
+List* build_nodes(int size)
+{
+	int	i;
+	Node*	n;
+	List*	l;
+
+	l = malloc(sizeof(List));
+	l->first = malloc(sizeof(Node));
+
+	n = l->first;
+	n->c = EMPTY;
+	n->prev = NULL;
+	n->next = NULL;
+
+	for (i = 0; i < size - 1; i++) {
+		n->next = malloc(sizeof(Node));
+		n->next->prev = n;
+		n->next->next = NULL;
+		n->next->c = EMPTY;
+		n = n->next;
+	}
+
+	l->last = n;
+
+	return l;
+}
+
+void free_nodes(List* l)
+{
+	Node*	n;
+	Node*	next;
+
+	n = l->first;
+	while (n != NULL) {
+		next = n->next;
+		free(n);
+		n = next;
+	}
+	free(l);
+}
+
+/**
+ * @brief Resets the last n nodes.
+ */
+void reset_nodes(List* l, int res)
+{
+	int	i;
+	Node*	n;
+
+	n = l->last->prev;
+
+	i = 1;
+	while (n != NULL) {
+		if (i++ >= res) {
+			n->c = EMPTY;
+		}
+		n = n->prev;
+	}
+}
+
+/**
+ * @brief Inserts the char c last in the list l.
+ */
+void insert_char(List* l, char c)
+{
+	Node*	n;
+
+	n = l->first;
+	n->c = c;
+
+	l->last->next = n;
+	n->prev = l->last;
+	l->last = n;
+
+	l->first = n->next;
+	l->first->prev = NULL;
+	n->next = NULL;
+}
+
+/**
+ * @brief Find the node distance to the first matching node, starting from the 
+ * last node.
+ * 
+ * @return The distance to the closest match, or 0 if some nodes are still
+ * empty, or the size of the list if the list is unique.
+ */
+int find_match(List* l, char c)
+{
+	int	i;
+	Node*	n;
+
+	i = 1;
+	n = l->last->prev;
+
+	while (n != NULL) {
+		if (c == n->c) {
+			return i;
+		} else if (n->c == EMPTY) {
+			return 0;
+		}
+		n = n->prev;
+		i++;
+	}
+
+	return i;
+}
+
+int count_marker_length()
+{
+	int	length;
+	int	resets;
+	char	c;
+	List*	l;
+
+	l = build_nodes(MARKER_LENGTH);
+	length = 0;
+	
+	while ((c = getchar()) != EOF) {
+		insert_char(l, c);
+		resets = find_match(l, c);
+		length++;
+		if (resets == 0) {
+			continue;
+		} else if (resets != MARKER_LENGTH) {
+			reset_nodes(l, resets);
+		} else {
+			break;
+		}
+	}
+
+	free_nodes(l);
+
+	return length;
+}
 
 int main(void)
 {
 	int	ans;
 
-	ans = 0;
+	ans = count_marker_length();
 
 	printf("Task 2 ans: %d\n", ans);
 
