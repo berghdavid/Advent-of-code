@@ -3,4 +3,8 @@
 
 int next_int();
 
+int main(int argc, char* argv[]);
+
+void solve(char* ans);
+
 #endif
