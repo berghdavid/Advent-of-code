@@ -9,11 +9,29 @@ typedef struct Dir Dir;
 
 struct Dir {
 	char*	name;	/* Name of directory			*/
-	int	size;	/* Total size of files in directory	*/
+	long	size;	/* Total size of files in directory	*/
 	Dir*	par;	/* Parent directory			*/
 	Dir*	next;	/* Directory with same parent directory	*/
 	Dir*	sub;	/* Subdirectory				*/
 };
+
+char* read_string()
+{
+	char*	str;
+	char	c;
+	int	i;
+
+	str = calloc(MAX_STRING, sizeof(char));
+	str[MAX_STRING - 1] = '\0';
+
+	i = 0;
+	while ((c = getchar()) != '\n' && i < MAX_STRING - 1) {
+		str[i] = c;
+		i++;
+	}
+
+	return str;
+}
 
 void finish_row()
 {
@@ -32,7 +50,7 @@ void print_subdirs(Dir* d, int depth)
 	for (i = 0; i < depth; i++) {
 		printf("  ");
 	}
-	printf("- %s (%d)\n", d->name, d->size);
+	printf("- %s (%ld)\n", d->name, d->size);
 
 	if (d->sub != NULL) {
 		print_subdirs(d->sub, depth + 1);
@@ -72,24 +90,6 @@ void clean_subdir(Dir* d)
 	free(d);
 }
 
-char* read_string()
-{
-	char*	str;
-	char	c;
-	int	i;
-
-	str = calloc(MAX_STRING, sizeof(char));
-	str[MAX_STRING - 1] = '\0';
-
-	i = 0;
-	while ((c = getchar()) != '\n' && i < MAX_STRING - 1) {
-		str[i] = c;
-		i++;
-	}
-
-	return str;
-}
-
 void add_subdir(Dir* parent, Dir* sub)
 {
 	Dir*	d;
@@ -119,6 +119,14 @@ Dir* find_subdir(Dir* sub, char* name)
 	return find_subdir(sub->next, name);
 }
 
+void inc_dirsize(Dir* d, int size)
+{
+	d->size += size;
+	if (d->par != NULL) {
+		inc_dirsize(d->par, size);
+	}
+}
+
 void read_to_dir(Dir* d)
 {
 	int	nbr;
@@ -135,11 +143,10 @@ void read_to_dir(Dir* d)
 			nbr = 10 * nbr + c - '0';
 		} else if (nbr > 0) {
 			//printf("Adding %d to %s\n", nbr, curr->name);
-			curr->size += nbr;
+			inc_dirsize(curr, nbr);
 			nbr = 0;
 			finish_row();
 		} else if (c == 'd') {
-			/* Current row is "dir xxxxx" */
 			getchar();
 			getchar();
 			getchar();
@@ -189,18 +196,35 @@ Dir* build_system()
 	return root;
 }
 
+int get_total_size(Dir* d)
+{
+	int	n;
+
+	n = 0;
+	if (d->size < 100000) {
+		n += d->size;
+	}
+
+	if (d->sub != NULL) {
+		n += get_total_size(d->sub);
+	}
+	
+	if (d->next != NULL) {
+		n += get_total_size(d->next);
+	}
+	return n;
+}
+
 void solve(char* ans)
 {
-	int	size;
+	long	size;
 	Dir*	root;
 
-	size = 0;
 	root = build_system();
-	//print_subdirs(root, 1);
 
-	/* TODO: Read system */
+	size = get_total_size(root);
 
-	sprintf(ans, "%d", size);
+	sprintf(ans, "%ld", size);
 
 	clean_subdir(root);
 }
