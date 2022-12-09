@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 const int MAX_STRING = 11;
+const long MAX_FILE = 100000;
 
 typedef struct Dir Dir;
 
@@ -201,7 +202,7 @@ int get_total_size(Dir* d)
 	int	n;
 
 	n = 0;
-	if (d->size < 100000) {
+	if (d->size < MAX_FILE) {
 		n += d->size;
 	}
 
