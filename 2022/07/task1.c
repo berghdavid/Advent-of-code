@@ -8,11 +8,11 @@ const int MAX_STRING = 11;
 typedef struct Dir Dir;
 
 struct Dir {
-	int	subs;
-	int	size;
-	char*	name;
-	Dir*	par;
-	Dir*	sub;
+	char*	name;	/* Name of directory			*/
+	int	size;	/* Total size of files in directory	*/
+	Dir*	par;	/* Parent directory			*/
+	Dir*	next;	/* Directory with same parent directory	*/
+	Dir*	sub;	/* Subdirectory				*/
 };
 
 void finish_row()
@@ -34,75 +34,42 @@ void print_subdirs(Dir* d, int depth)
 	}
 	printf("- %s (%d)\n", d->name, d->size);
 
-	for (i = 0; i < d->subs; i++) {
-		print_subdirs(&d->sub[i], depth + 1);
+	if (d->sub != NULL) {
+		print_subdirs(d->sub, depth + 1);
+	}
+
+	if (d->next != NULL) {
+		print_subdirs(d->next, depth);
 	}
 }
 
-Dir* malloc_dir(char* name, Dir* parent, int subfolders, int size)
+Dir* init_dir()
 {
-	int	i;
 	Dir*	d;
 
 	d = malloc(sizeof(Dir));
-	d->name = name;
-	d->par = parent;
-	d->subs = subfolders;
-	d->size = size;
-	if (subfolders == 0) {
-		d->sub = NULL;
-	} else {
-		d->sub = malloc(subfolders * sizeof(Dir));
-		for (i = 0; i < subfolders; i++) {
-			d->sub[i].par = d;
-			d->sub[i].sub = NULL;
-			d->sub[i].subs = 0;
-			d->sub[i].size = 0;
-		}
-	}
+	d->name = NULL;
+	d->size = 0;
+	d->par = NULL;
+	d->next = NULL;
+	d->sub = NULL;
 
 	return d;
 }
 
-void init_subdirs(Dir* d, char** names, int subfolders)
-{
-	int	i;
-
-	d->subs = subfolders;
-	if (subfolders == 0) {
-		d->sub = NULL;
-	} else {
-		d->sub = malloc(subfolders * sizeof(Dir));
-		for (i = 0; i < subfolders; i++) {
-			init_empty_dir(&d->sub[i], d, names[i]);
-		}
-	}
-}
-
-void init_empty_dir(Dir* d, Dir* parent, char* name)
-{
-	d->name = name;
-	d->size = 0;
-	d->subs = 0;
-	d->sub = NULL;
-	d->par = parent;
-}
-
 void clean_subdir(Dir* d)
 {
-	int	i;
-
 	free(d->name);
 
-	if (d->subs == 0) {
-		return;
+	if (d->sub != NULL) {
+		clean_subdir(d->sub);
 	}
 
-	for (i = 0; i < d->subs; i++) {
-		clean_subdir(&d->sub[i]);
+	if (d->next != NULL) {
+		clean_subdir(d->next);
 	}
 
-	free(d->sub);
+	free(d);
 }
 
 char* read_string()
@@ -111,48 +78,63 @@ char* read_string()
 	char	c;
 	int	i;
 
-	str = malloc(MAX_STRING * sizeof(char));
+	str = calloc(MAX_STRING, sizeof(char));
 	str[MAX_STRING - 1] = '\0';
 
 	i = 0;
-	while ((c = getchar()) != '\n') {
-		str[i++] = c;
+	while ((c = getchar()) != '\n' && i < MAX_STRING - 1) {
+		str[i] = c;
+		i++;
 	}
 
 	return str;
 }
 
-Dir* find_subdir(Dir* curr, char* name)
+void add_subdir(Dir* parent, Dir* sub)
 {
-	int	i;
+	Dir*	d;
 
-	for (i = 0; i < curr->subs; i++) {
-		if (strcmp(curr->sub[i].name, name) == 0) {
-			return &curr->sub[i];
-		}
+	//printf("Adding %s to directory %s\n", sub->name, parent->name);
+
+	sub->par = parent;
+	if (parent->sub == NULL) {
+		parent->sub = sub;
+		return;
 	}
-	return curr;
+	d = parent->sub;
+	while (d->next != NULL) {
+		d = d->next;
+	}
+	d->next = sub;
+}
+
+Dir* find_subdir(Dir* sub, char* name)
+{
+	if (sub == NULL) {
+		printf("ERROR: COULD NOT FIND SUBDIR: %s\n", name);
+		return sub;
+	} else if (strcmp(sub->name, name) == 0) {
+		return sub;
+	}
+	return find_subdir(sub->next, name);
 }
 
 void read_to_dir(Dir* d)
 {
 	int	nbr;
-	int	subs;
 	char	c;
-	char**	strings;
+	char*	str;
 	Dir*	curr;
+	Dir*	sub;
 
-	strings = malloc(10 * sizeof(char*));
 	curr = d;
-	subs = 0;
 	nbr = 0;
 
 	while ((c = getchar()) != EOF) {
 		if (isdigit(c)) {
 			nbr = 10 * nbr + c - '0';
 		} else if (nbr > 0) {
-			printf("%s: %d -> %d = %d\n",
-				curr->name, nbr, curr->size, nbr + curr->size);
+			//printf("Adding %d to %s\n", nbr, curr->name);
 			curr->size += nbr;
 			nbr = 0;
 			finish_row();
@@ -161,30 +143,31 @@ void read_to_dir(Dir* d)
 			getchar();
 			getchar();
 			getchar();
-			getchar();
-			strings[subs++] = read_string();
-			subs++;
+
+			sub = init_dir();
+			sub->name = read_string();
+			add_subdir(curr, sub);
 		} else if (c == '$') {
-			/* There will always be a "$ cd " here */
-			init_subdirs(curr, strings, subs);
-			subs = 0;
-
 			getchar();
-			getchar();
-			getchar();
-
-			c = getchar();
-			if (c == '.') {
-				curr = curr->par;
+			if (getchar() == 'l') {
+				/* Skip "$ ls" */
 				finish_row();
-			} else {
-				strings[0] = read_string();
-				curr = find_subdir(curr, strings[0]);
-				free(strings[0]);
+				continue;
 			}
+
+			getchar();
+			getchar();
+			str = read_string();
+			if (str[0] == '.') {
+				//printf("Entering %s\n", curr->par->name);
+				curr = curr->par;
+			} else {
+				//printf("Entering %s\n", str);
+				curr = find_subdir(curr->sub, str);
+			}
+			free(str);
 		}
 	}
-	free(strings);
 }
 
 Dir* build_system()
@@ -196,10 +179,8 @@ Dir* build_system()
 	name[0] = '/';
 	name[1] = '\0';
 
-	root = malloc(sizeof(Dir));
+	root = init_dir();
 	root->name = name;
-	root->par = NULL;
-	root->size = 0;
 
 	finish_row();
 	finish_row();
@@ -215,11 +196,11 @@ void solve(char* ans)
 
 	size = 0;
 	root = build_system();
+	//print_subdirs(root, 1);
 
 	/* TODO: Read system */
 
 	sprintf(ans, "%d", size);
 
 	clean_subdir(root);
-	free(root);
 }
