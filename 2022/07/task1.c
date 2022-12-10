@@ -95,8 +95,6 @@ void add_subdir(Dir* parent, Dir* sub)
 {
 	Dir*	d;
 
-	//printf("Adding %s to directory %s\n", sub->name, parent->name);
-
 	sub->par = parent;
 	if (parent->sub == NULL) {
 		parent->sub = sub;
@@ -143,7 +141,6 @@ void read_to_dir(Dir* d)
 		if (isdigit(c)) {
 			nbr = 10 * nbr + c - '0';
 		} else if (nbr > 0) {
-			//printf("Adding %d to %s\n", nbr, curr->name);
 			inc_dirsize(curr, nbr);
 			nbr = 0;
 			finish_row();
@@ -167,10 +164,8 @@ void read_to_dir(Dir* d)
 			getchar();
 			str = read_string();
 			if (str[0] == '.') {
-				//printf("Entering %s\n", curr->par->name);
 				curr = curr->par;
 			} else {
-				//printf("Entering %s\n", str);
 				curr = find_subdir(curr->sub, str);
 			}
 			free(str);

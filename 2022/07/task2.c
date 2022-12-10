@@ -3,9 +3,10 @@
 #include <string.h>
 #include <ctype.h>
 
+#define min(x, y) (((x) < (y)) ? (x) : (y))
+
 const int MAX_STRING = 11;
 const long MAX_FILE = 100000;
-const long MAX_SPACE = 40000000;
 
 typedef struct Dir Dir;
 
@@ -96,8 +97,6 @@ void add_subdir(Dir* parent, Dir* sub)
 {
 	Dir*	d;
 
-	//printf("Adding %s to directory %s\n", sub->name, parent->name);
-
 	sub->par = parent;
 	if (parent->sub == NULL) {
 		parent->sub = sub;
@@ -144,7 +143,6 @@ void read_to_dir(Dir* d)
 		if (isdigit(c)) {
 			nbr = 10 * nbr + c - '0';
 		} else if (nbr > 0) {
-			//printf("Adding %d to %s\n", nbr, curr->name);
 			inc_dirsize(curr, nbr);
 			nbr = 0;
 			finish_row();
@@ -168,10 +166,8 @@ void read_to_dir(Dir* d)
 			getchar();
 			str = read_string();
 			if (str[0] == '.') {
-				//printf("Entering %s\n", curr->par->name);
 				curr = curr->par;
 			} else {
-				//printf("Entering %s\n", str);
 				curr = find_subdir(curr->sub, str);
 			}
 			free(str);
@@ -198,21 +194,39 @@ Dir* build_system()
 	return root;
 }
 
-int find_min_dir(Dir* d)
+int find_min_dir(Dir* d, long to_free, long glob_min)
 {
-	int	n;
-	n = 0;
-	return n;
+	int	loc;
+
+	loc = glob_min;
+
+	if (d->sub != NULL) {
+		loc = min(loc, find_min_dir(d->sub, to_free, glob_min));
+	}
+
+	if (d->next != NULL) {
+		loc = min(loc, find_min_dir(d->next, to_free, glob_min));
+	}
+
+	if (d->size >= to_free) {
+		loc = min(d->size, loc);
+	}
+
+	return loc;
 }
 
 void solve(char* ans)
 {
+	long	req_space;
+	long	to_free;
 	long	size;
 	Dir*	root;
 
+	req_space = 40000000;
 	root = build_system();
 
-	size = find_min_dir(root);
+	to_free = root->size - req_space;
+	size = find_min_dir(root, to_free, root->size);
 
 	sprintf(ans, "%ld", size);
 
