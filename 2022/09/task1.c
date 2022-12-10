@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "../common/utils.h"
 
-const int LEN = 501;
+const int LEN = 1001;
 
 typedef struct Knot Knot;
 
@@ -16,8 +16,10 @@ Knot* init_knot()
 	Knot*	k;
 
 	k = malloc(sizeof(Knot));
-	k->x = LEN/2;
 	k->y = LEN/2;
+	k->x = LEN/2;
+
+	return k;
 }
 
 int norm(int n)
@@ -30,22 +32,22 @@ int norm(int n)
 	return 0;
 }
 
-void move_knot(Knot* k, int dx, int dy)
+void move_knot(Knot* k, int dy, int dx)
 {
-	k->x += dx;
 	k->y += dy;
+	k->x += dx;
 }
 
 void follow_knot(Knot* head, Knot* tail)
 {
-	int	dx;
 	int	dy;
+	int	dx;
 	
-	dx = head->x - tail->x;
 	dy = head->y - tail->y;
+	dx = head->x - tail->x;
 
-	if (abs(dx) > 1 || abs(dy) > 1) {
-		move_knot(tail, norm(dx), norm(dy));
+	if (abs(dy) > 1 || abs(dx) > 1) {
+		move_knot(tail, norm(dy), norm(dx));
 	}
 }
 
@@ -87,20 +89,20 @@ int make_moves(Knot* head, Knot* tail)
 
 		getchar();
 		n = next_int();
-		move_knot(head, i * n, j * n);
-		getchar();
-
-		follow_knot(head, tail);
-		printf("Head: [%d, %d]\n", head->y, head->x);
-		printf("Tail: [%d, %d]\n", tail->y, tail->x);
-		grid[tail->y][tail->x] = 1;
+		for (; n > 0; n--) {
+			move_knot(head, i, j);
+			follow_knot(head, tail);
+			grid[tail->y][tail->x] = 1;
+		}
 	}
 
 	for (i = 0; i < LEN; i++) {
 		for (j = 0; j < LEN; j++) {
 			visited += grid[i][j];
 		}
+		free(grid[i]);
 	}
+	free(grid);
 
 	return visited;
 }
