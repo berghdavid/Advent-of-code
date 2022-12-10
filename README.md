@@ -9,4 +9,4 @@ These are my solutions to [Advent of Code](https://adventofcode.com/). Enjoy!
 - 20 &#11088; using Python
 
 ## 2022
-- 14 &#11088; using C
+- 16 &#11088; using C
