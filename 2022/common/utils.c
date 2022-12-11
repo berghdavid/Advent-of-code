@@ -37,9 +37,6 @@ int main(int argc, char* argv[])
 	char		ans[100];
 	clock_t		start;
 	clock_t		end;
-	//struct timeval	begin, end;
-	long		seconds;
-	long		microseconds;
 	double		elapsed_ms;
 
 	if (argc == 0) {
@@ -48,16 +45,11 @@ int main(int argc, char* argv[])
 
 	if (argc > 1 && strcmp(argv[1], "time") == 0) {
 		start = clock();
-		//gettimeofday(&begin, 0);
 		solve(ans);
 		end = clock();
-		//gettimeofday(&end, 0);
 
 		elapsed_ms = (end - start) * 1000.0 / CLOCKS_PER_SEC;
-
-		//seconds = end.tv_sec - begin.tv_sec;
-		//microseconds = end.tv_usec - begin.tv_usec;
-		//elapsed_ms = seconds*1e3 + microseconds*1e-3;
+		
 		printf("%s execution time: %.3f (ms)\n", argv[0], elapsed_ms);
 	} else {
 		solve(ans);
