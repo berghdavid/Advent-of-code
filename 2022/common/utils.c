@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
-#include <sys/time.h>
+#include <time.h>
 #include <string.h>
 #include "utils.h"
 
@@ -35,9 +35,8 @@ int next_int()
 int main(int argc, char* argv[])
 {
 	char		ans[100];
-	struct timeval	begin, end;
-	long		seconds;
-	long		microseconds;
+	clock_t		start;
+	clock_t		end;
 	double		elapsed_ms;
 
 	if (argc == 0) {
@@ -45,13 +44,12 @@ int main(int argc, char* argv[])
 	}
 
 	if (argc > 1 && strcmp(argv[1], "time") == 0) {
-		gettimeofday(&begin, 0);
+		start = clock();
 		solve(ans);
-		gettimeofday(&end, 0);
+		end = clock();
 
-		seconds = end.tv_sec - begin.tv_sec;
-		microseconds = end.tv_usec - begin.tv_usec;
-		elapsed_ms = seconds*1e3 + microseconds*1e-3;
+		elapsed_ms = (end - start) * 1000.0 / CLOCKS_PER_SEC;
+		
 		printf("%s execution time: %.3f (ms)\n", argv[0], elapsed_ms);
 	} else {
 		solve(ans);
