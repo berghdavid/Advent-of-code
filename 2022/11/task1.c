@@ -13,6 +13,8 @@ struct Item {
 };
 
 struct Monkey {
+	int	id;
+	int	counter;
 	Item*	first;
 	int	add_op;
 	int	mul_op;
@@ -22,6 +24,14 @@ struct Monkey {
 	Monkey*	f_monkey;
 	Monkey*	monkeys;
 };
+
+int power(int a, int b)
+{
+	if (b == 1) {
+		return a;
+	}
+	return a * a;
+}
 
 int nextint()
 {
@@ -65,6 +75,8 @@ Monkey* init_monkeys()
 	monkeys = malloc(MONKEY_NBR * sizeof(Monkey));
 	for (i = 0; i < MONKEY_NBR; i++) {
 		m = &monkeys[i];
+		m->id = i;
+		m->counter = 0;
 		m->first = NULL;
 		m->monkeys = monkeys;
 		m->add_op = 0;
@@ -114,6 +126,7 @@ void push_item(Monkey* m, Item* item)
 {
 	Item*	i;
 
+	item->next = NULL;
 	if (m->first == NULL) {
 		m->first = item;
 		return;
@@ -131,7 +144,6 @@ Item* pop_item(Monkey* m)
 	Item*	i;
 
 	if (m->first == NULL) {
-		printf("ERROR: Popping empty item list.\n");
 		return NULL;
 	}
 	i = m->first;
@@ -146,16 +158,20 @@ void read_to_monkey(Monkey* m)
 	char	c;
 	Item*	i;
 
+	finish_line();
+
 	/* Read monkey items */
 	jump_chars(18);
-	nbr = nextint();
-	while (nbr != 0) {
+	while ((nbr = nextint()) != 0) {
 		i = init_item(nbr);
 		push_item(m, i);
+		if (getchar() == '\n') {
+			break;
+		}
 	}
 
 	/* Read operation */
-	jump_chars(23);
+	jump_chars(21);
 	c = getchar();
 	getchar();
 	if (c == '+') {
@@ -179,9 +195,43 @@ void read_to_monkey(Monkey* m)
 	m->t_monkey = &m->monkeys[nbr];
 
 	/* Read false test monkey */
-	jump_chars(29);
+	jump_chars(30);
 	nbr = nextint();
 	m->f_monkey = &m->monkeys[nbr];
+	finish_line();
+}
+
+void print_monkey(Monkey* m)
+{
+	Item*	item;
+
+	printf("Monkey %d:\n", m->id);
+	printf("  Inspected items: %d\n", m->counter);
+	printf("  Starting items: ");
+	item = m->first;
+	if (item != NULL) {
+		printf("%d", item->worry);
+		while (item->next != NULL) {
+			printf(", %d", item->next->worry);
+			item = item->next;
+		}
+	}
+	
+
+	printf("\n  old = old ^ %d * %d + %d\n", m->mul_old, m->mul_op,
+		m->add_op);
+	printf("  Test: divisible by %d\n", m->div);
+	printf("    If true: throw to monkey %d\n", m->t_monkey->id);
+	printf("    If false: throw to monkey %d\n", m->f_monkey->id);
+}
+
+void print_monkeys(Monkey* monkeys)
+{
+	int	i;
+
+	for (i = 0; i < MONKEY_NBR; i++) {
+		print_monkey(&monkeys[i]);
+	}
 }
 
 void read_to_monkeys(Monkey* monkeys)
@@ -191,9 +241,71 @@ void read_to_monkeys(Monkey* monkeys)
 
 	for (i = 0; i < MONKEY_NBR; i++) {
 		m = &monkeys[i];
-		printf("Read monkey\n");
 		read_to_monkey(m);
 	}
+}
+
+void inspect_item(Monkey* m, Item* item)
+{
+	//printf("--- Inspecting item %d ---\n", item->worry);
+	//printf("  Worry = %d^%d * %d + %d = ", item->worry, m->mul_old,
+	//	m->mul_op, m->add_op);
+	item->worry = power(item->worry, m->mul_old) * m->mul_op + m->add_op;
+	//printf("%d\n", item->worry);
+	item->worry /= 3;
+	//printf("  Divided by 3 => %d\n", item->worry);
+	//printf("  Item %d is divisible by %d? ", item->worry, m->div);
+	if (item->worry % m->div == 0) {
+		push_item(m->t_monkey, item);
+		//printf("Yes!\n  Push to %d\n", m->t_monkey->id);
+	} else {
+		push_item(m->f_monkey, item);
+		//printf("No!\n  Push to %d\n", m->f_monkey->id);
+	}
+	m->counter++;
+}
+
+void simulate_monkey(Monkey* m)
+{
+	Item*	item;
+
+	//print_monkey(m);
+	while ((item = pop_item(m)) != NULL) {
+		inspect_item(m, item);
+	}
+}
+
+void simulate_rounds(Monkey* monkeys, int rounds)
+{
+	int	i;
+	int	j;
+
+	for (i = 0; i < rounds; i++) {
+		for (j = 0; j < MONKEY_NBR; j++) {
+			simulate_monkey(&monkeys[j]);
+		}
+	}
+}
+
+int monkey_business(Monkey* monkeys)
+{
+	int	i;
+	int	score;
+	int	max_1;
+	int	max_2;
+	
+	max_1 = 0;
+	max_2 = 0;
+	for (i = 0; i < MONKEY_NBR; i++) {
+		score = monkeys[i].counter;
+		if (score > max_1) {
+			max_2 = max_1;
+			max_1 = score;
+		} else if (score > max_2) {
+			max_2 = score;
+		}
+	}
+	return max_1 * max_2;
 }
 
 void solve(char* ans)
@@ -202,11 +314,11 @@ void solve(char* ans)
 	Monkey*	monkeys;
 
 	monkeys = init_monkeys();
-
 	read_to_monkeys(monkeys);
+	simulate_rounds(monkeys, 20);
+
+	sol = monkey_business(monkeys);
 
 	clean_monkeys(monkeys);
-	sol = 0;
-
 	sprintf(ans, "%d", sol);
 }
