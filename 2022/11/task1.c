@@ -247,20 +247,12 @@ void read_to_monkeys(Monkey* monkeys)
 
 void inspect_item(Monkey* m, Item* item)
 {
-	//printf("--- Inspecting item %d ---\n", item->worry);
-	//printf("  Worry = %d^%d * %d + %d = ", item->worry, m->mul_old,
-	//	m->mul_op, m->add_op);
 	item->worry = power(item->worry, m->mul_old) * m->mul_op + m->add_op;
-	//printf("%d\n", item->worry);
 	item->worry /= 3;
-	//printf("  Divided by 3 => %d\n", item->worry);
-	//printf("  Item %d is divisible by %d? ", item->worry, m->div);
 	if (item->worry % m->div == 0) {
 		push_item(m->t_monkey, item);
-		//printf("Yes!\n  Push to %d\n", m->t_monkey->id);
 	} else {
 		push_item(m->f_monkey, item);
-		//printf("No!\n  Push to %d\n", m->f_monkey->id);
 	}
 	m->counter++;
 }
@@ -269,7 +261,6 @@ void simulate_monkey(Monkey* m)
 {
 	Item*	item;
 
-	//print_monkey(m);
 	while ((item = pop_item(m)) != NULL) {
 		inspect_item(m, item);
 	}

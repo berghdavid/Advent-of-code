@@ -8,25 +8,25 @@ typedef struct Item Item;
 typedef struct Monkey Monkey;
 
 struct Item {
-	unsigned long long int	worry;
+	long	worry;
 	Item*	next;
 };
 
 struct Monkey {
 	int	id;
-	unsigned long	counter;
+	long	counter;
 	Item*	first;
 	int	add_op;
 	int	mul_op;
 	int	mul_old;
-	int	div;
-	int	rel;
+	long	div;
+	long	rel;
 	Monkey*	t_monkey;
 	Monkey*	f_monkey;
 	Monkey*	monkeys;
 };
 
-int power(int a, int b)
+long power(long a, long b)
 {
 	if (b == 1) {
 		return a;
@@ -189,7 +189,7 @@ void read_to_monkey(Monkey* m)
 	/* Read test */
 	jump_chars(21);
 	nbr = nextint();
-	m->div = nbr;
+	m->div = (long) nbr;
 
 	/* Read true test monkey */
 	jump_chars(29);
@@ -212,20 +212,13 @@ void print_monkey(Monkey* m)
 	printf("  Items: ");
 	item = m->first;
 	if (item != NULL) {
-		printf("%llu", item->worry);
+		printf("%ld", item->worry);
 		while (item->next != NULL) {
-			printf(", %llu", item->next->worry);
+			printf(", %ld", item->next->worry);
 			item = item->next;
 		}
 	}
 	printf("\n");
-
-	//printf("\n  old = old ^ %d * %d + %d\n", m->mul_old, m->mul_op,
-	//	m->add_op);
-	//printf("  Test: divisible by %d\n", m->div);
-	//printf("    If true: throw to monkey %d\n", m->t_monkey->id);
-	//printf("    If false: throw to monkey %d\n", m->f_monkey->id);
-	//printf("  Relaxation factor %d\n", m->rel);
 }
 
 void print_monkeys(Monkey* monkeys)
@@ -258,9 +251,9 @@ void read_to_monkeys(Monkey* monkeys)
 
 void inspect_item(Monkey* m, Item* item)
 {
+	item->worry %= m->rel;
 	item->worry = power(item->worry, m->mul_old) * m->mul_op + m->add_op;
 
-	item->worry %= m->rel;
 	if (item->worry % m->div == 0) {
 		push_item(m->t_monkey, item);
 	} else {
@@ -290,12 +283,12 @@ void simulate_rounds(Monkey* monkeys, int rounds)
 	}
 }
 
-unsigned long monkey_business(Monkey* monkeys)
+long monkey_business(Monkey* monkeys)
 {
 	int	i;
-	unsigned long	score;
-	unsigned long	max_1;
-	unsigned long	max_2;
+	long	score;
+	long	max_1;
+	long	max_2;
 	
 	max_1 = 0;
 	max_2 = 0;
@@ -316,16 +309,11 @@ void solve(char* ans)
 	long	sol;
 	Monkey*	monkeys;
 
-	// Tested: 15068176146
-
 	monkeys = init_monkeys();
 	read_to_monkeys(monkeys);
-	simulate_rounds(monkeys, 20);
-
-	print_monkeys(monkeys);
-
+	simulate_rounds(monkeys, 10000);
 	sol = monkey_business(monkeys);
 
 	clean_monkeys(monkeys);
-	sprintf(ans, "%lu", sol);
+	sprintf(ans, "%ld", sol);
 }
