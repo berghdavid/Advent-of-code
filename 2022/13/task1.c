@@ -67,10 +67,23 @@ void print_pair(Pair* p)
 	printf("\n");
 }
 
+void print_all_pairs(Pair* first)
+{
+	Pair*	p;
+
+	p = first;
+	while (p != NULL) {
+		print_pair(p);
+		p = p->next;
+	}
+}
+
 int read_to_list(List*	first)
 {
 	int	x;
 	int	is_nbr;
+	int	depth;
+	int	prev_c;
 	char	c;
 	List*	l;
 	
@@ -82,24 +95,33 @@ int read_to_list(List*	first)
 	l->val = -1;
 	x = 0;
 	is_nbr = 0;
+	depth = 0;
+	prev_c = '*';
 
 	while (c != '\n') {
 		//printf("Read %c\n", c);
 		if (c == '[') {
+			//printf("d=%d: Inserting list\n", depth);
 			l->first = init_list();
 			l->first->parent = l;
+			depth++;
 			l = l->first;
 		} else if (c == ']') {
 			if (is_nbr == 1) {
-				//printf("Inserting nbr %d\n", x);
+				//printf("d=%d: Inserting nbr %d\n", depth, x);
 				l->val = x;
 				is_nbr = 0;
 				x = 0;
 			}
+			depth--;
 			l = l->parent;
+			if (prev_c == '[') {
+				free(l->first);
+				l->first = NULL;
+			}
 		} else if (c == ',') {
 			if (is_nbr == 1) {
-				//printf("Inserting nbr %d\n", x);
+				//printf("d=%d: Inserting nbr %d\n", depth, x);
 				l->val = x;
 				is_nbr = 0;
 				x = 0;
@@ -111,6 +133,7 @@ int read_to_list(List*	first)
 			is_nbr = 1;
 			x = 10 * x + c - '0';
 		}
+		prev_c = c;
 		c = getchar();
 	}
 
@@ -127,42 +150,6 @@ int read_to_pair(Pair* p)
 	}
 	getchar();
 	return 0;
-}
-
-Pair* init_pairs()
-{
-	Pair*	first;
-	Pair*	prev;
-	Pair*	p;
-
-	first = init_pair();
-	if (read_to_pair(first) != 0) {
-		return first;
-	}
-	
-	prev = first;
-	while (1) {
-		p = init_pair();
-		prev->next = p;
-		if (read_to_pair(p) == 1) {
-			break;
-		}
-		print_pair(p);
-		prev->next = p;
-	}
-
-	return first;
-}
-
-void print_all_pairs(Pair* first)
-{
-	Pair*	p;
-
-	p = first;
-	while (p != NULL) {
-		print_pair(p);
-		p = p->next;
-	}
 }
 
 void free_list(List* l)
@@ -192,6 +179,32 @@ void free_pairs(Pair* first)
 	}
 }
 
+Pair* init_pairs()
+{
+	Pair*	first;
+	Pair*	prev;
+	Pair*	p;
+
+	first = init_pair();
+	if (read_to_pair(first) != 0) {
+		return first;
+	}
+	
+	prev = first;
+	while (1) {
+		p = init_pair();
+		if (read_to_pair(p) == 1) {
+			free_pairs(p);
+			break;
+		} else {
+			prev->next = p;
+		}
+		prev = p;
+	}
+
+	return first;
+}
+
 int get_score(Pair* first)
 {
 	/* TODO: Calculate score */
@@ -204,8 +217,6 @@ void solve(char* ans)
 	int	score;
 
 	first = init_pairs();
-
-	//print_all_pairs(first);
 
 	score = get_score(first);
 	free_pairs(first);
