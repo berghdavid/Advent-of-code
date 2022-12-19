@@ -228,7 +228,6 @@ int cmp_list(List* l1, List* l2)
 	} else if (l2 == NULL) {
 		return -1;
 	}
-	//printf("Comparing %d <-> %d\n", l1->val, l2->val);
 
 	if (l1->val != l2->val) {
 		if (l1->val != -1 && l2->val != -1) {
@@ -284,7 +283,6 @@ int get_score(Pair* first)
 		if (res == 1) {
 			score += res * i;
 		}
-		printf("%d: score = %d\n", i, score);
 		i++;
 		p = p->next;
 	}
@@ -294,10 +292,6 @@ int get_score(Pair* first)
 
 void solve(char* ans)
 {
-	/* 294  - too low
-	   4961 - too low
-	*/
-
 	Pair*	first;
 	int	score;
 
