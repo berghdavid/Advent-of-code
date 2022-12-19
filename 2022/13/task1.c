@@ -205,14 +205,99 @@ Pair* init_pairs()
 	return first;
 }
 
+int norm_pts(int a)
+{
+	if (a > 0) {
+		return 1;
+	} else if (a < 0) {
+		return -1;
+	}
+	return 0;
+}
+
+int cmp_list(List* l1, List* l2)
+{
+	int	tmp;
+
+	if (l1 == NULL) {
+		if (l2 == NULL) {
+			return 0;
+		} else {
+			return 1;
+		}
+	} else if (l2 == NULL) {
+		return -1;
+	}
+	//printf("Comparing %d <-> %d\n", l1->val, l2->val);
+
+	if (l1->val != l2->val) {
+		if (l1->val != -1 && l2->val != -1) {
+			tmp = norm_pts(l2->val - l1->val);
+			if (tmp != 0) {
+				return tmp;
+			}
+			return cmp_list(l1->next, l2->next);
+		}
+
+		/* Different types, make one into a list */
+		if (l1->val == -1) {
+			tmp = l2->val;
+			l2->val = -1;
+			l2->first = init_list();
+			l2->first->parent = l2;
+			l2->first->val = tmp;
+		} else {
+			tmp = l1->val;
+			l1->val = -1;
+			l1->first = init_list();
+			l1->first->parent = l1;
+			l1->first->val = tmp;
+		}
+
+		tmp = cmp_list(l1->first, l2->first);
+		if (tmp != 0) {
+			return tmp;
+		}
+	} else if (l1->val == -1 || l2->val == -1) {
+		tmp = cmp_list(l1->first, l2->first);
+		if (tmp != 0) {
+			return tmp;
+		}
+	}
+
+	return cmp_list(l1->next, l2->next);
+}
+
+
 int get_score(Pair* first)
 {
-	/* TODO: Calculate score */
-	return 0;
+	int	score;
+	int	res;
+	int	i;
+	Pair*	p;
+
+	score = 0;
+	i = 1;
+	p = first;
+	while (p != NULL) {
+		res = cmp_list(p->l1, p->l2);
+		if (res == 1) {
+			score += res * i;
+		}
+		printf("%d: score = %d\n", i, score);
+		i++;
+		p = p->next;
+	}
+
+	return score;
 }
 
 void solve(char* ans)
 {
+	/* 294  - too low
+	   4961 - too low
+	*/
+
 	Pair*	first;
 	int	score;
 
