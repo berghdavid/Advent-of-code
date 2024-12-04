@@ -6,6 +6,6 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-. .env
+. ../.env
 cp -r -n empty_day ../$1
 make build && AOC_SESSION=$AOC_SESSION ./bin/main $1
