@@ -16,7 +16,7 @@ build: $(C_FILES)
 	@$(CC) -o bin/main $(W_FLAGS) $(OPT_FLAGS) $(C_FILES) $(LDFLAGS)
 
 debug_vg: build_vg # Run using Valgrind memcheck
-	@valgrind --tool=memcheck --track-origins=yes ./bin/main_vg
+	@valgrind --tool=memcheck --track-origins=yes ./bin/main_vg < data/data.in
 
 build_vg: $(C_FILES)
 	@$(CC) -o bin/main_vg $(VG_FLAGS) $(W_FLAGS) $(C_FILES) $(LDFLAGS)
