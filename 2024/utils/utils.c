@@ -5,18 +5,19 @@
 #include <string.h>
 #include <curl/curl.h>
 
-int submit(char* ans, int day, int level) {
+int submit(char* ans, char* day, char* level) {
 	const char *session_token = getenv("AOC_SESSION");
+
 	if (!session_token) {
 		fprintf(stderr, "Error: AOC_SESSION environment variable is not set.\n");
 		return 1;
 	}
 
 	char url[256];
-	snprintf(url, sizeof(url), "https://adventofcode.com/2024/day/%d/answer", day);
+	snprintf(url, sizeof(url), "https://adventofcode.com/2024/day/%s/answer", day);
 
 	char post_data[256];
-	snprintf(post_data, sizeof(post_data), "level=%d&answer=%s", level, ans);
+	snprintf(post_data, sizeof(post_data), "level=%s&answer=%s", level, ans);
 
 	CURL *curl = curl_easy_init();
 	if (!curl) {
@@ -50,7 +51,7 @@ int submit(char* ans, int day, int level) {
 			curl_easy_strerror(res)
 		);
 	} else {
-		printf("Answer submitted successfully.\n");
+		printf("Answer submitted successfully!\n");
 	}
 
 	// Clean up
