@@ -12,7 +12,7 @@ all: build_1 build_2
 	@./bin/1 < data/data.in
 
 2: build_2
-	@./bin/2 < data/data2.in
+	@./bin/2 < data/data.in
 
 build_1: $(C_1_FILES)
 	@$(CC) -o bin/1 $(W_FLAGS) $(OPT_FLAGS) $(C_1_FILES) $(LDFLAGS)
@@ -20,14 +20,14 @@ build_1: $(C_1_FILES)
 build_2: $(C_2_FILES)
 	@$(CC) -o bin/2 $(W_FLAGS) $(OPT_FLAGS) $(C_2_FILES) $(LDFLAGS)
 
-debug_1_vg: build_1_vg # Run using Valgrind memcheck
-	@valgrind --tool=memcheck --track-origins=yes ./bin/1_vg < data/data.in
+debug_1: build_1_vg # Run using Valgrind memcheck
+	@valgrind --tool=memcheck --track-origins=yes --leak-check=full ./bin/1_vg < data/data.in
 
 build_1_vg: $(C_1_FILES)
 	@$(CC) -o bin/1_vg $(VG_FLAGS) $(W_FLAGS) $(C_1_FILES) $(LDFLAGS)
 
-debug_2_vg: build_2_vg # Run using Valgrind memcheck
-	@valgrind --tool=memcheck --track-origins=yes ./bin/2_vg < data/data.in
+debug_2: build_2_vg # Run using Valgrind memcheck
+	@valgrind --tool=memcheck --track-origins=yes --leak-check=full ./bin/2_vg < data/data.in
 
 build_2_vg: $(C_2_FILES)
 	@$(CC) -o bin/2_vg $(VG_FLAGS) $(W_FLAGS) $(C_2_FILES) $(LDFLAGS)

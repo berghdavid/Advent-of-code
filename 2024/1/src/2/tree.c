@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "tree.h"
 
 Entry* init_entry(int key)
@@ -11,7 +12,7 @@ Entry* init_entry(int key)
 	e->left = NULL;
 	e->right = NULL;
 	e->parent = NULL;
-	e->val = 0;
+	e->val = 1;
 	return e;
 }
 
@@ -244,18 +245,22 @@ void bst_destroy(Tree* t)
  * @return Entry that should be in the place of the @p curr entry, or the
  * @p curr entry itself if it is correctly positioned.
  */
-static Entry* bst_insert_rec(Entry* curr, Entry* e)
+static Entry* bst_insert_rec(Entry* curr, int key)
 {
-	if (!curr || e->key == curr->key) {
-		return e;
+	if (!curr) {
+		return init_entry(key);
+	}
+	if (key == curr->key) {
+		curr->val++;
+		return curr;
 	}
 
-	if (e->key < curr->key) {
-		curr->left = bst_insert_rec(curr->left, e);
+	if (key < curr->key) {
+		curr->left = bst_insert_rec(curr->left, key);
 		// TODO: Only set parent after insertion of new entry
 		curr->left->parent = curr;
 	} else {
-		curr->right = bst_insert_rec(curr->right, e);
+		curr->right = bst_insert_rec(curr->right, key);
 		// TODO: Only set parent after insertion of new entry
 		curr->right->parent = curr;
 	}
@@ -263,9 +268,9 @@ static Entry* bst_insert_rec(Entry* curr, Entry* e)
 	return bst_balance(curr);
 }
 
-void bst_insert(Tree* t, int val)
+void bst_insert(Tree* t, int key)
 {
-	t->root = bst_insert_rec(t->root, init_entry(val));
+	t->root = bst_insert_rec(t->root, key);
 }
 
 Entry* bst_get(Tree* t, int key)
@@ -308,22 +313,22 @@ static void bst_print_rec(int max_height, Entry* e)
 	bst_print_indented(indentation);
 	printf("+-----------------------\n");
 	bst_print_indented(indentation);
-	printf("| Key:         %llu\n", e->key);
+	printf("| Key:         %d\n", e->key);
 	bst_print_indented(indentation);
 	if (e->parent) {
-		printf("| Parent:      %llu\n", e->parent->key);
+		printf("| Parent:      %d\n", e->parent->key);
 	} else {
 		printf("| Parent:      NULL\n");
 	}
 	bst_print_indented(indentation);
 	if (e->left) {
-		printf("| Left child:  %llu\n", e->left->key);
+		printf("| Left child:  %d\n", e->left->key);
 	} else {
 		printf("| Left child:  NULL\n");
 	}
 	bst_print_indented(indentation);
 	if (e->right) {
-		printf("| Right child: %llu\n", e->right->key);
+		printf("| Right child: %d\n", e->right->key);
 	} else {
 		printf("| Right child: NULL\n");
 	}

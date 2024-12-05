@@ -30,7 +30,7 @@ Tree* bst_init();
 void bst_destroy(Tree* t);
 
 /* Insert a new entry into the BST. Replaces existing entry with same key. */
-void bst_insert(Tree* t, int e);
+void bst_insert(Tree* t, int key);
 
 /**
  * @brief Find the entry in the BST with the provided key. This function

@@ -37,21 +37,9 @@ int main(int argc, char* argv[])
 	counter = 0;
 	while((curr = next_positive_int()) >= 0) {
 		if (counter % 2 == 0) {
-			e = bst_get(left, curr);
-			if (!e) {
-				e = init_entry(curr);
-				bst_insert(left, curr);
-			} else {
-				e->val++;
-			}
+			bst_insert(left, curr);
 		} else {
-			e = bst_get(right, curr);
-			if (!e) {
-				e = init_entry(curr);
-				bst_insert(right, curr);
-			} else {
-				e->val++;
-			}
+			bst_insert(right, curr);
 		}
 		counter++;
 	}

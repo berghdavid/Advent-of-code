@@ -1,35 +1,35 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct Entry Entry;
+typedef struct Node Node;
 typedef struct Tree Tree;
 
 /* Key-value pair, referenced in the BST and the LFU list */
-struct Entry {
+struct Node {
+	Node*	left;	/* Left node in BST		*/
+	Node*	right;	/* Right node in BST		*/
+	Node*	parent;	/* Parent node in BST		*/
 	int	key;	/* Key in binary search tree	*/
-	Entry*	left;	/* Left node in BST		*/
-	Entry*	right;	/* Right node in BST		*/
-	Entry*	parent;	/* Parent node in BST		*/
 	int	val;	/* Held object			*/
 	int	height;	/* Height of this node in BST	*/
 };
 
 /* Used as BST */
 struct Tree {
-	Entry*	root;
+	Node*	root;
 };
 
-Entry* init_entry(int key)
+Node* init_node(int key, int val)
 {
-	Entry*	e;
+	Node*	e;
 
-	e = malloc(sizeof(Entry));
+	e = malloc(sizeof(Node));
 	e->height = 0;
 	e->key = key;
 	e->left = NULL;
 	e->right = NULL;
 	e->parent = NULL;
-	e->val = 0;
+	e->val = val;
 	return e;
 }
 
@@ -41,11 +41,11 @@ static int max(int a, int b) {
 }
 
 /**
- * @brief Get height of entry in BST.
- * @param e Entry (or node) that has been admitted to the BST.
- * @return 0 if entry is NULL, otherwise get the height field.
+ * @brief Get height of node in BST.
+ * @param e Node (or node) that has been admitted to the BST.
+ * @return 0 if node is NULL, otherwise get the height field.
  */
-static int bst_height(Entry* e)
+static int bst_height(Node* e)
 {
 	if (e) {
 		return e->height;
@@ -54,17 +54,17 @@ static int bst_height(Entry* e)
 }
 
 /**
- * @brief Compute and set the correct height for the provided entry.
- * @param e Entry (or node) that has been admitted to the BST.
+ * @brief Compute and set the correct height for the provided node.
+ * @param e Node (or node) that has been admitted to the BST.
  */
-static void bst_update_height(Entry* e)
+static void bst_update_height(Node* e)
 {
 	if (e) {
 		e->height = 1 + max(bst_height(e->left), bst_height(e->right));
 	}
 }
 
-static int bst_get_balance(Entry* node) {
+static int bst_get_balance(Node* node) {
 	if (node) {
 		return bst_height(node->left) - bst_height(node->right);
 	}
@@ -72,11 +72,11 @@ static int bst_get_balance(Entry* node) {
 }
 
 /**
- * @brief Get the leftmost entry.
- * @param e Entry (or node) that has been admitted to the BST.
- * @return Entry that has no left child.
+ * @brief Get the leftmost node.
+ * @param e Node (or node) that has been admitted to the BST.
+ * @return Node that has no left child.
  */
-static Entry* bst_get_leftmost(Entry* e)
+static Node* bst_get_leftmost(Node* e)
 {
 	while (e->left) {
 		e = e->left;
@@ -87,10 +87,10 @@ static Entry* bst_get_leftmost(Entry* e)
 /**
  * @brief Rotate nodes in BST left. Used during balancing.
  */
-static Entry* bst_rotate_left(Entry* p)
+static Node* bst_rotate_left(Node* p)
 {
-	Entry*	e1;
-	Entry*	e2;
+	Node*	e1;
+	Node*	e2;
 
 	e1 = p->right;
 	e2 = e1->left;
@@ -114,10 +114,10 @@ static Entry* bst_rotate_left(Entry* p)
 /**
  * @brief Rotate nodes in BST right. Used during balancing.
  */
-static Entry* bst_rotate_right(Entry* p)
+static Node* bst_rotate_right(Node* p)
 {
-	Entry*	e1;
-	Entry*	e2;
+	Node*	e1;
+	Node*	e2;
 
 	e1 = p->left;
 	e2 = e1->right;
@@ -141,7 +141,7 @@ static Entry* bst_rotate_right(Entry* p)
 /**
  * @brief Balance the BST. Perform after insertion or deletion.
  */
-static Entry* bst_balance(Entry* e)
+static Node* bst_balance(Node* e)
 {
 	int	balance;
 
@@ -168,11 +168,11 @@ static Entry* bst_balance(Entry* e)
 }
 
 /**
- * @brief Remove entry from BST, returns the replacing entry
+ * @brief Remove node from BST, returns the replacing node
  */ 
-static Entry* bst_remove(const Entry* e) {
-	Entry*	b;	// Entry to start balancing from
-	Entry*	rep;	// Entry to replace e's position
+static Node* bst_remove(const Node* e) {
+	Node*	b;	// Node to start balancing from
+	Node*	rep;	// Node to replace e's position
 
 	b = e->parent;
 
@@ -238,64 +238,67 @@ Tree* bst_init()
 	return t;
 }
 
-void free_entry(Entry* e)
+void free_node(Node* e)
 {
 	if (e->left) {
-		free_entry(e->left);
+		free_node(e->left);
 	}
 	if (e->right) {
-		free_entry(e->right);
+		free_node(e->right);
 	}
 	free(e);
 }
 
 void bst_destroy(Tree* t)
 {
-	free_entry(t->root);
+	free_node(t->root);
 	free(t);
 }
 
 /**
- * @brief Insert a new entry into BST using recursion.
+ * @brief Insert a new node into BST using recursion.
  * @param curr Current position in BST.
- * @param e Entry to be inserted.
- * @return Entry that should be in the place of the @p curr entry, or the
- * @p curr entry itself if it is correctly positioned.
+ * @return Node that should be in the place of the @p curr node, or the
+ * @p curr node itself if it is correctly positioned.
  */
-static Entry* bst_insert_rec(Entry* curr, Entry* e)
+static Node* bst_insert_rec(Node* curr, int key, int val)
 {
-	if (!curr || e->key == curr->key) {
-		return e;
+	if (!curr) {
+		return init_node(key, val);
+	}
+	if (key == curr->key) {
+		return curr;
+		// Do something if node exists?
 	}
 
-	if (e->key < curr->key) {
-		curr->left = bst_insert_rec(curr->left, e);
-		// TODO: Only set parent after insertion of new entry
+	if (key < curr->key) {
+		curr->left = bst_insert_rec(curr->left, key, val);
+		// TODO: Only set parent after insertion of new node
 		curr->left->parent = curr;
 	} else {
-		curr->right = bst_insert_rec(curr->right, e);
-		// TODO: Only set parent after insertion of new entry
+		curr->right = bst_insert_rec(curr->right, key, val);
+		// TODO: Only set parent after insertion of new node
 		curr->right->parent = curr;
 	}
 
 	return bst_balance(curr);
 }
 
-void bst_insert(Tree* t, int val)
+void bst_insert(Tree* t, int key, int val)
 {
-	t->root = bst_insert_rec(t->root, init_entry(val));
+	t->root = bst_insert_rec(t->root, key, val);
 }
 
 /**
- * @brief Find the entry in the BST with the provided key. This function
+ * @brief Find the node in the BST with the provided key. This function
  * is NOT thread safe, and requires the BST to be locked.
  * @param t BST.
  * @param key Key to look for, of type unsigned long long.
- * @return Entry with the same key, or NULL if none exists.
+ * @return Node with the same key, or NULL if none exists.
  */
-Entry* bst_get(Tree* t, int key)
+Node* bst_get(Tree* t, int key)
 {
-	Entry*	e;
+	Node*	e;
 
 	e = t->root;
 	while (e && e->key != key) {
