@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "../../../utils/submit.c"
 #include "../../../utils/utils.c"
 
 int main(int argc, char* argv[])

@@ -7,5 +7,5 @@ if [ "$#" -ne 1 ]; then
 fi
 
 . ../.env
-cp -r -n empty_day ../$1
+cp -r -n empty_day ../../$1
 make build && AOC_SESSION=$AOC_SESSION ./bin/main $1

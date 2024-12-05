@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "../../../utils/submit.c"
 #include "../../../utils/utils.c"
 
 void merge(int arr[], int l, int m, int r)
