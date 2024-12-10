@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
 	// Output file for input data
 	char filename[256];
-	snprintf(filename, sizeof(filename), "../%s/data/data.in", argv[1]);
+	snprintf(filename, sizeof(filename), "../../%s/data/data.in", argv[1]);
 	FILE *output = fopen(filename, "wb");
 	if (!output) {
 		fprintf(stderr, "Error: Unable to open output file.\n");

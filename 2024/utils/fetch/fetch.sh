@@ -2,7 +2,7 @@
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <day>"
-	echo "Example: $0 1"
+    echo "Example: $0 1"
     exit 1
 fi
 
